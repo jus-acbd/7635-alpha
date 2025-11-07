@@ -1,0 +1,12 @@
+﻿{
+  "name": "my-auth-site",
+  "version": "1.0.0",
+  "description": "A simple authentication site",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@vercel/node": "^2.0.0"
+  }
+}
