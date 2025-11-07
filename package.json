@@ -1,6 +1,7 @@
 ﻿{
   "name": "my-auth-site",
   "version": "1.0.0",
+  "type": "module",
   "description": "A simple authentication site",
   "scripts": {
     "dev": "vercel dev"

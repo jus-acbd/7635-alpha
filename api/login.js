@@ -1,35 +1,19 @@
-﻿// 使用 crypto 进行更安全的哈希
-const crypto = require('crypto');
+﻿import crypto from 'crypto';
 
-// 简单的JWT生成（生产环境建议使用jsonwebtoken库）
+// 简单的JWT生成
 function generateToken(payload, secret) {
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64');
-  const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64');
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
   
   const signature = crypto
     .createHmac('sha256', secret)
     .update(`${header}.${payloadEncoded}`)
-    .digest('base64');
+    .digest('base64url');
   
   return `${header}.${payloadEncoded}.${signature}`;
 }
 
-// 验证Token
-function verifyToken(token, secret) {
-  try {
-    const [header, payload, signature] = token.split('.');
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(`${header}.${payload}`)
-      .digest('base64');
-    
-    return signature === expectedSignature;
-  } catch {
-    return false;
-  }
-}
-
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // 设置CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -47,9 +31,9 @@ module.exports = async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    console.log('Login attempt:', username); // 调试日志
+    console.log('Login attempt:', username);
     
-    // 验证用户（这里简化了，实际应该查数据库）
+    // 验证用户
     const validUsers = {
       'admin': '123456',
       'user': 'password', 
@@ -61,7 +45,7 @@ module.exports = async (req, res) => {
       const payload = {
         username: username,
         userId: username === 'admin' ? 1 : 2,
-        exp: Date.now() + (24 * 60 * 60 * 1000) // 24小时过期
+        exp: Date.now() + (24 * 60 * 60 * 1000)
       };
       
       const secret = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
@@ -88,4 +72,4 @@ module.exports = async (req, res) => {
       message: '服务器内部错误'
     });
   }
-};
+}
